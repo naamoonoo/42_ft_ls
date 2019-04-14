@@ -22,7 +22,7 @@ int	main(int ac, char *av[])
 			ls.fi = ls.fi->next;
 		}
 	}
-	else if(!file_exist && (ac < 1 || !ls.flag)) // error input comes
+	else
 		ft_ls(ls, ".", 0);
 	return (0);
 }
@@ -60,21 +60,20 @@ void	ft_ls(t_ls ls, char *name, int is_root)
 	// char			*tmp;
 
 	start = 0;
+	is_root ? printf("%s: \n", name) : 0;
 	if ((d = opendir(name)))
 	{
-		is_root ? printf("%s: \n", name) : 0;
 		while ((p = readdir(d)))
 		{
-			if (!IS_a_FLAG(ls.flag) && IS_HIDDEN(p->d_name))
-				continue;
-			make_linked_data(p, &dp, start++, name);
+			make_linked_data(p, &dp, start++);
 		}
 		sort_dp(&dp, ls);
 		display_dp(dp, ls);
-		while (IS_R_FLAG(ls.flag) && dp)
+		while (dp)
 		{
-			if (dp->type == DT_DIR && !is_hidden(dp->name))
+			if (dp->type == DT_DIR && !IS_HIDDEN(dp->name))
 			{
+				dp->curr = ft_strjoin_by(name, dp->name, '/');
 				ft_ls(ls, dp->curr, 1);
 				free(dp->curr);
 			}
@@ -85,23 +84,19 @@ void	ft_ls(t_ls ls, char *name, int is_root)
 	else
 	{
 		//len control need ls
-		printf("%s\n", name);
+		printf("%s\n" name);
 	}
 
 
 }
 
-void	make_linked_data(struct dirent *p, t_dp **dp, int start, char *name)
+void	make_linked_data(struct dirent *p, t_dp **dp, int start)
 {
 	t_dp		*temp;
-	struct stat	info;
 
 	temp = malloc(sizeof(t_dp));
 	temp->name = p->d_name;
 	temp->type = p->d_type;
-	temp->curr = ft_strjoin_by(name, p->d_name, '/');
-	lstat(temp->name, &info);
-	temp->info = info;
 	temp->next = NULL;
 	temp->prev = NULL;
 	if (start != 0)
@@ -143,10 +138,27 @@ void	sort_dp(t_dp **dp, t_ls ls)
 
 void	display_dp(t_dp *dp, t_ls ls)
 {
+	// char			*tmp;
+	struct stat		info;
+
+	// ls.curr = ft_strjoin(name, "/");
+	// if (IS_DIR(dp->name))
+	// {
+	// while (IS_HIDDEN(dp->name))
+	// 	dp = dp->next;
 	ls.len +=1;
+	// printf("%s: \n", dp->name);
 	while (dp)
 	{
+		lstat(dp->name, &info);
+		// // if (!IS_a_FLAG(ls.flag) &&
+		if(IS_HIDDEN(dp->name))
+		{
+			dp = dp->next;
+			continue;
+		}
 		printf("%s\t", dp->name);
+
 		dp = dp->next;
 	}
 	printf("\n\n");
@@ -154,21 +166,13 @@ void	display_dp(t_dp *dp, t_ls ls)
 
 void	swap_dp(t_dp **dp)
 {
-	char		*t_name;
-	char		*t_curr;
-	struct stat	t_info;
-	int			t_type;
+	char	*t_name;
+	int		t_type;
 
 	t_name = (*dp)->next->name;
 	t_type = (*dp)->next->type;
-	t_curr = (*dp)->next->curr;
-	t_info = (*dp)->next->info;
 	(*dp)->next->name = (*dp)->name;
 	(*dp)->next->type = (*dp)->type;
-	(*dp)->next->curr = (*dp)->curr;
-	(*dp)->next->info = (*dp)->info;
 	(*dp)->name = t_name;
 	(*dp)->type = t_type;
-	(*dp)->curr = t_curr;
-	(*dp)->info = t_info;
 }
