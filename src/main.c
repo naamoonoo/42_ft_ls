@@ -2,32 +2,32 @@
 
 int	main(int ac, char *av[])
 {
-	int 	file_exist;
+	int		f_count;
 	int		i;
 	t_ls	ls;
 
-	file_exist = 0;
+	f_count = 0;
 	i = 1;
 	while (ac > 1 && i < ac && ft_start_with(av[i], '-'))
-		ls.flag = get_ls_flag(&av[i++][1]);
-	while (ac > 1 && i < ac)
-		make_linked_fi(av[i++], &ls, &file_exist);
-	if (file_exist)
+		ls.flag = get_ls_flag(&av[i++][1], &ac);
+	while (ac > 1 && av[i])
+		make_linked_fi(av[i++], &ls, &f_count);
+	if (f_count)
 	{
 		fi_set_to_head(&ls.fi);
 		sort_fi(&ls.fi);
 		while (ls.fi)
 		{
-			ft_ls(ls, ls.fi->name, 0);
+			ft_ls(ls, ls.fi->name, (f_count > 1 || ac - f_count > 1) ? 1 : 0);
 			ls.fi = ls.fi->next;
 		}
+		// free(ls.fi)
 	}
-	else if(!file_exist && (ac < 1 || !ls.flag)) // error input comes
-		ft_ls(ls, ".", 0);
+	(ac == 1) ? ft_ls(ls, ".", 0) : 0;
 	return (0);
 }
 
-void	make_linked_fi(char *name, t_ls *ls, int *file_exist)
+void	make_linked_fi(char *name, t_ls *ls, int *f_count)
 {
 	static int	count = 0;
 	t_fi		*temp;
@@ -48,50 +48,39 @@ void	make_linked_fi(char *name, t_ls *ls, int *file_exist)
 		ls->fi->next = temp;
 	}
 	ls->fi = temp;
-	*file_exist += 1;
+	*f_count += 1;
 }
 
-void	ft_ls(t_ls ls, char *name, int is_root)
+void	ft_ls(t_ls ls, char *name, int root_show)
 {
 	DIR				*d;
 	struct dirent	*p;
 	t_dp			*dp;
-	int				start;
-	// char			*tmp;
+	int				dp_exist;
 
-	start = 0;
+	dp_exist = 0;
 	if ((d = opendir(name)))
 	{
-		is_root ? printf("%s: \n", name) : 0;
+		root_show ? printf("%s: \n", name) : 0;
 		while ((p = readdir(d)))
 		{
 			if (!IS_a_FLAG(ls.flag) && IS_HIDDEN(p->d_name))
 				continue;
-			make_linked_data(p, &dp, start++, name);
+			make_linked_data(p, &dp, dp_exist++, name);
 		}
-		sort_dp(&dp, ls);
-		display_dp(dp, ls);
-		while (IS_R_FLAG(ls.flag) && dp)
+		dp_exist ? sort_dp(&dp, &ls) : 0;
+		dp_exist ? display_dp(dp, ls) : ft_printf("\n");
+		while (dp_exist && IS_R_FLAG(ls.flag) && dp)
 		{
-			if (dp->type == DT_DIR && !is_hidden(dp->name))
-			{
+			if (dp->type == DT_DIR && !is_hidden(dp->name) && dp->curr)
 				ft_ls(ls, dp->curr, 1);
-				free(dp->curr);
-			}
 			dp = dp->next;
+			//free dp
 		}
-		//freeing
 	}
-	else
-	{
-		//len control need ls
-		printf("%s\n", name);
-	}
-
-
 }
 
-void	make_linked_data(struct dirent *p, t_dp **dp, int start, char *name)
+void	make_linked_data(struct dirent *p, t_dp **dp, int dp_exist, char *name)
 {
 	t_dp		*temp;
 	struct stat	info;
@@ -99,12 +88,16 @@ void	make_linked_data(struct dirent *p, t_dp **dp, int start, char *name)
 	temp = malloc(sizeof(t_dp));
 	temp->name = p->d_name;
 	temp->type = p->d_type;
-	temp->curr = ft_strjoin_by(name, p->d_name, '/');
-	lstat(temp->name, &info);
+	if (!is_hidden(temp->name))
+		temp->curr = ft_strjoin_by(name, p->d_name, '/');
+	else
+		temp->curr = NULL;
+	lstat(temp->curr, &info);
+	// nameing printing with color depend on info!
 	temp->info = info;
 	temp->next = NULL;
 	temp->prev = NULL;
-	if (start != 0)
+	if (dp_exist != 0)
 	{
 		temp->prev = (*dp);
 		(*dp)->next = temp;
@@ -112,17 +105,18 @@ void	make_linked_data(struct dirent *p, t_dp **dp, int start, char *name)
 	(*dp) = temp;
 }
 
-void	sort_dp(t_dp **dp, t_ls ls)
+void	sort_dp(t_dp **dp, t_ls *ls)
 {
 	int	times;
 
+	ls->len = (int)ft_strlen((*dp)->name);
 	dp_set_to_head(dp);
 	times = get_dp_len(*dp);
 	while (times-- > 0)
 	{
 		while ((*dp)->next)
 		{
-			if (IS_r_FLAG(ls.flag) ?
+			if (IS_r_FLAG(ls->flag) ?
 				ft_strcmp((*dp)->name, (*dp)->next->name) < 0 :
 				ft_strcmp((*dp)->name, (*dp)->next->name) > 0)
 				swap_dp(dp);
@@ -132,7 +126,7 @@ void	sort_dp(t_dp **dp, t_ls ls)
 			// 	swap_dp(dp);
 			// else if (!IS_r_FLAG(ls.flag) && ft_strcmp((*dp)->name, (*dp)->next->name) > 0)
 			// 	swap_dp(dp);
-			ls.len = get_big((int)ft_strlen((*dp)->name), ls.len);
+			ls->len = get_big((int)ft_strlen((*dp)->name), ls->len);
 			(*dp) = (*dp)->next;
 		}
 		dp_set_to_head(dp);
@@ -143,13 +137,26 @@ void	sort_dp(t_dp **dp, t_ls ls)
 
 void	display_dp(t_dp *dp, t_ls ls)
 {
-	ls.len +=1;
+	char	*temp;
+
 	while (dp)
 	{
-		printf("%s\t", dp->name);
+		temp = ft_strsub(ctime(&(dp->info.st_mtime)), 4, 12);
+		IS_l_FLAG(ls.flag) ?
+		ft_printf("%s\t%d\t%s\t%s\t%d\t%s\t%s\n",
+			ft_itoa_base(dp->info.st_mode, 2 ,0),
+			dp->info.st_nlink,
+			getpwuid(dp->info.st_uid)->pw_name,
+			getgrgid(dp->info.st_gid)->gr_name,
+			dp->info.st_size,
+			temp,
+			dp->name
+			) :
+		ft_printf("%-*s", ls.len + 1, dp->name);
+		free(temp);
 		dp = dp->next;
 	}
-	printf("\n\n");
+	ft_printf("\n\n");
 }
 
 void	swap_dp(t_dp **dp)
@@ -172,3 +179,7 @@ void	swap_dp(t_dp **dp)
 	(*dp)->curr = t_curr;
 	(*dp)->info = t_info;
 }
+// ft_atoi.c        	ft_atoi_base.c
+// ft_atoi.c             ft_memccpy.c
+// ft_atoi.o        ft_atoi_base.ol
+// ft_atoi.c             ft_memccpy.c

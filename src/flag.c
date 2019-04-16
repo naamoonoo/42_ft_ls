@@ -6,7 +6,7 @@
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/10 14:19:09 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/12 14:33:48 by hnam             ###   ########.fr       */
+/*   Updated: 2019/04/14 23:56:36 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ t_flags c_to_b_flag[] =
 	{0, 0},
 };
 
-int get_ls_flag(char *flags)
+int get_ls_flag(char *flags, int *counter)
 {
 	int	flag;
 	int	i;
@@ -36,10 +36,14 @@ int get_ls_flag(char *flags)
 			error_exit(INVALID_FLAG, flags);
 		i = -1;
 		while (++i < NUM_OF_FLAG)
+		{
 			if (c_to_b_flag[i].flag == *flags)
+			{
 				flag = flag | c_to_b_flag[i].bin_flag;
+			}
+		}
 		flags++;
 	}
-	printf("%s\n", ft_itoa_base(flag, 2, 0));
+	*counter -= 1;
 	return flag;
 }

@@ -2,17 +2,17 @@
 
 int	main(int ac, char *av[])
 {
-	int 	file_exist;
+	int 	file_counter;
 	int		i;
 	t_ls	ls;
 
-	file_exist = 0;
+	file_counter = 0;
 	i = 1;
 	while (ac > 1 && i < ac && ft_start_with(av[i], '-'))
 		ls.flag = get_ls_flag(&av[i++][1]);
 	while (ac > 1 && i < ac)
-		make_linked_fi(av[i++], &ls, &file_exist);
-	if (file_exist)
+		make_linked_fi(av[i++], &ls, &file_counter);
+	if (file_counter)
 	{
 		fi_set_to_head(&ls.fi);
 		sort_fi(&ls.fi);
@@ -27,7 +27,7 @@ int	main(int ac, char *av[])
 	return (0);
 }
 
-void	make_linked_fi(char *name, t_ls *ls, int *file_exist)
+void	make_linked_fi(char *name, t_ls *ls, int *file_counter)
 {
 	static int	count = 0;
 	t_fi		*temp;
@@ -48,10 +48,10 @@ void	make_linked_fi(char *name, t_ls *ls, int *file_exist)
 		ls->fi->next = temp;
 	}
 	ls->fi = temp;
-	*file_exist += 1;
+	*file_counter += 1;
 }
 
-void	ft_ls(t_ls ls, char *name, int is_root)
+void	ft_ls(t_ls ls, char *name, int root_show)
 {
 	DIR				*d;
 	struct dirent	*p;
@@ -63,7 +63,7 @@ void	ft_ls(t_ls ls, char *name, int is_root)
 
 	if ((d = opendir(name)))
 	{
-		is_root ? printf("%s: \n", name) : 0;
+		root_show ? printf("%s: \n", name) : 0;
 		while ((p = readdir(d)))
 		{
 			make_linked_data(p, &dp, start++, name);

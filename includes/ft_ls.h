@@ -6,7 +6,7 @@
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/11 13:31:49 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/13 22:59:31 by hnam             ###   ########.fr       */
+/*   Updated: 2019/04/14 13:09:00 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,10 +99,10 @@ typedef struct		s_ls
 	char			*curr;
 }					t_ls;
 
-void				make_linked_fi(char *name, t_ls *ls, int *file_exist);
-void				ft_ls(t_ls ls, char *name, int is_root);
+void				make_linked_fi(char *name, t_ls *ls, int *f_count);
+void				ft_ls(t_ls ls, char *name, int root_show);
 
-int					get_ls_flag(char *flags);
+int					get_ls_flag(char *flags, int *counter);
 
 // void				make_linked_data(struct dirent *p, t_dp **dp, int start);
 void				make_linked_data(struct dirent *p, t_dp **dp, int start, char *name);
@@ -121,7 +121,7 @@ void				swap_fi(t_fi **fi);
 void				sort_fi(t_fi **fi);
 
 void				swap_dp(t_dp **dp);
-void				sort_dp(t_dp **dp, t_ls ls);
+void				sort_dp(t_dp **dp, t_ls *ls);
 void				dp_set_to_head(t_dp **dp);
 int					get_dp_len(t_dp *dp);
 void	handle_dp_data(DIR *dirp, t_ls ls);
