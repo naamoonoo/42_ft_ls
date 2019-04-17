@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/04/16 21:45:05 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/16 21:45:05 by hnam             ###   ########.fr       */
+/*   Created: 2019/04/16 21:45:10 by hnam              #+#    #+#             */
+/*   Updated: 2019/04/16 22:18:36 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-void	error_alert(int type, char *input)
+void	free_dp(t_dp *dp)
 {
-	if (type == INVALID_INPUT)
-		printf("ft_ls: %s: No such file or directory\n", input);
-}
+	t_dp	*tmp;
 
-void	error_exit(int type, char *input)
-{
-	if (type == INVALID_FLAG)
-		printf("ft_ls: illegal option -- %c\nusage: ls [-%s] [file ...]\n",
-			input[0], VALID_FLAG);
-	exit(0);
+	dp_set_to_head(&dp);
+	while (dp)
+	{
+		tmp = dp;
+		free(dp->curr);
+		dp = dp->next;
+		free(tmp);
+	}
 }
