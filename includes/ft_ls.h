@@ -91,6 +91,7 @@ void				ft_ls(t_ls ls, char *name, int root_show);
 int					get_ls_flag(char *flags, int *counter);
 void				make_linked_data(struct dirent *p, t_dp **dp,
 						char *name, t_ls *ls);
+
 char				*get_mode(int mode);
 void				display_l_form(t_dp *dp, t_ls ls);
 void				colored_print(char *name, int mode);
