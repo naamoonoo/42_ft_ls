@@ -6,7 +6,7 @@
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/16 21:38:08 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/16 21:55:56 by hnam             ###   ########.fr       */
+/*   Updated: 2019/04/16 23:50:26 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,14 @@ void	sort_fi(t_fi **fi)
 		}
 		fi_set_to_head(fi);
 	}
+	fi_set_to_head(fi);
 }
 
-void	sort_dp(t_dp **dp, t_ls ls)
+void	sort_dp(t_dp **dp, t_ls ls, char *name, int root_show)
 {
 	int	times;
 
+	root_show ? ft_printf("%s: \n", name) : 0;
 	dp_set_to_head(dp);
 	times = get_dp_len(*dp);
 	while (times-- > 0)

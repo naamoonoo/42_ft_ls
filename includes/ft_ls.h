@@ -6,16 +6,12 @@
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/11 13:31:49 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/16 22:28:24 by hnam             ###   ########.fr       */
+/*   Updated: 2019/04/16 23:55:22 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_LS_H
 # define FT_LS_H
-
-//
-# include <stdio.h>
-//
 
 # include "../lib/libftprintf/includes/ft_printf.h"
 # include "../lib/libftprintf/includes/libft.h"
@@ -31,15 +27,6 @@
 # include <grp.h>
 # include <limits.h>
 
-// #define	DT_UNKNOWN	 0
-// #define	DT_FIFO		 1
-// #define	DT_CHR		 2
-// #define	DT_DIR		 4 // folder
-// #define	DT_BLK		 6
-// #define	DT_REG		 8 // excute
-// #define	DT_LNK		10
-// #define	DT_SOCK		12
-// #define	DT_WHT		14
 # define VALID_FLAG "1larRtScTuUfG"
 # define NUM_OF_FLAG ((int)ft_strlen(VALID_FLAG))
 
@@ -96,15 +83,14 @@ typedef struct		s_ls
 {
 	t_fi			*fi;
 	int				flag;
+	int				dp_exist;
 }					t_ls;
 
 void				make_linked_fi(char *name, t_ls *ls, int *f_count);
 void				ft_ls(t_ls ls, char *name, int root_show);
-
 int					get_ls_flag(char *flags, int *counter);
-
-// void				make_linked_data(struct dirent *p, t_dp **dp, int start);
-void				make_linked_data(struct dirent *p, t_dp **dp, int start, char *name, t_ls ls);
+void				make_linked_data(struct dirent *p, t_dp **dp,
+						char *name, t_ls *ls);
 char				*get_mode(int mode);
 void				display_l_form(t_dp *dp, t_ls ls);
 void				colored_print(char *name, int mode);
@@ -121,13 +107,12 @@ void				swap_fi(t_fi **fi);
 void				sort_fi(t_fi **fi);
 
 void				swap_dp(t_dp **dp);
-void				sort_dp(t_dp **dp, t_ls ls);
+void				sort_dp(t_dp **dp, t_ls ls, char *name, int root_show);
 void				dp_set_to_head(t_dp **dp);
 int					get_dp_len(t_dp *dp);
 int					is_hidden(char *name);
 
 void				error_alert(int type, char *input);
 void				error_exit(int type, char *input);
-
 
 #endif

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   data.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/04/16 22:56:18 by hnam              #+#    #+#             */
+/*   Updated: 2019/04/16 23:20:09 by hnam             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_ls.h"
 
 void		make_linked_fi(char *name, t_ls *ls, int *f_count)
@@ -24,8 +36,7 @@ void		make_linked_fi(char *name, t_ls *ls, int *f_count)
 	*f_count += 1;
 }
 
-void		make_linked_data(struct dirent *p, t_dp **dp,
-	int dp_exist, char *name, t_ls ls)
+void		make_linked_data(struct dirent *p, t_dp **dp, char *name, t_ls *ls)
 {
 	t_dp		*temp;
 	struct stat	info;
@@ -36,10 +47,10 @@ void		make_linked_data(struct dirent *p, t_dp **dp,
 	temp->curr = ft_strjoin_by(name, p->d_name, "/");
 	lstat(temp->curr, &info);
 	temp->info = info;
-	temp->time_ = get_time(info, ls);
+	temp->time_ = get_time(info, *ls);
 	temp->next = NULL;
 	temp->prev = NULL;
-	if (dp_exist != 0)
+	if (ls->dp_exist++ != 0)
 	{
 		temp->prev = (*dp);
 		(*dp)->next = temp;

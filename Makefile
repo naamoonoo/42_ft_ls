@@ -1,8 +1,8 @@
-NAME = ls
+NAME = ft_ls
 
 SRC=$(wildcard src/*.c)
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror -Iincludes -g -fsanitize=address
+CFLAGS=-Wall -Wextra -Werror -Iincludes
 OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
 
 all: $(NAME)
@@ -14,7 +14,7 @@ obj/%.o: src/%.c
 	gcc $(CFLAGS) $(OPTION) -c -o $@ $<
 
 $(NAME): obj $(OBJ)
-	cd lib/libftprintf && make -f Makefile
+	cd lib/libftprintf && make
 	mv lib/libftprintf/libftprintf.a .
 	$(CC) -o $(NAME) $(CFLAGS) $(SRC) libftprintf.a
 

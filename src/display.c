@@ -6,7 +6,7 @@
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/16 21:43:03 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/16 22:18:51 by hnam             ###   ########.fr       */
+/*   Updated: 2019/04/16 23:53:24 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	display_dp(t_dp *dp, t_ls ls)
 	{
 		blocks += dp->info.st_blocks;
 		if (!dp->next)
-			break;
+			break ;
 		dp = dp->next;
 	}
 	dp_set_to_head(&dp);
@@ -34,7 +34,7 @@ void	display_dp(t_dp *dp, t_ls ls)
 		else
 			display_name(dp, ls);
 		if (!dp->next)
-			break;
+			break ;
 		dp = dp->next;
 	}
 	if (!IS_SAME(ls.flag, l_FLAG) && !IS_SAME(ls.flag, one_FLAG))
@@ -47,7 +47,6 @@ void	display_l_form(t_dp *dp, t_ls ls)
 	char	*buf;
 	char	*mode;
 
-
 	t = ft_strsub(ctime(&(dp->time_)), 4, 12);
 	mode = get_mode(dp->info.st_mode);
 	buf = ft_memalloc(dp->info.st_size + 1);
@@ -55,7 +54,7 @@ void	display_l_form(t_dp *dp, t_ls ls)
 		readlink(dp->curr, buf, dp->info.st_size + 1);
 	else
 		buf = NULL;
-	ft_printf("%s %2d %-5s%6s %6d %s ",
+	ft_printf("%s %2d %-5s %s %6lld %s ",
 	mode, dp->info.st_nlink, getpwuid(dp->info.st_uid)->pw_name,
 	getgrgid(dp->info.st_gid)->gr_name, dp->info.st_size,
 	IS_SAME(ls.flag, T_FLAG) ? ctime(&(dp->time_)) : t);

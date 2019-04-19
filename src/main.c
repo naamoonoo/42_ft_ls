@@ -6,7 +6,7 @@
 /*   By: hnam <hnam@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/16 21:44:26 by hnam              #+#    #+#             */
-/*   Updated: 2019/04/16 22:27:56 by hnam             ###   ########.fr       */
+/*   Updated: 2019/04/16 23:53:34 by hnam             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,29 +17,27 @@ void	ft_ls(t_ls ls, char *name, int root_show)
 	DIR				*d;
 	struct dirent	*p;
 	t_dp			*dp;
-	int				dp_exist;
 
-	dp_exist = 0;
+	ls.dp_exist = 0;
 	if ((d = opendir(name)))
 	{
-		root_show ? ft_printf("%s: \n", name) : 0;
 		while ((p = readdir(d)))
 		{
 			if (!IS_SAME(ls.flag, a_FLAG) && IS_HIDDEN(p->d_name))
 				continue;
-			make_linked_data(p, &dp, dp_exist++, name, ls);
+			make_linked_data(p, &dp, name, &ls);
 		}
-		dp_exist ? sort_dp(&dp, ls) : 0;
-		dp_exist ? display_dp(dp, ls) : ft_printf("\n");
-		while (dp_exist && IS_SAME(ls.flag, R_FLAG) && dp)
+		ls.dp_exist ? sort_dp(&dp, ls, name, root_show) : 0;
+		ls.dp_exist ? display_dp(dp, ls) : ft_printf("\n");
+		while (ls.dp_exist && IS_SAME(ls.flag, R_FLAG) && dp)
 		{
-			if (dp->type == DT_DIR && !is_hidden(dp->name) && dp->curr)
+			if (S_ISDIR(dp->info.st_mode) && !is_hidden(dp->name) && dp->curr)
 				ft_ls(ls, dp->curr, 1);
 			if (!dp->next)
-				break;
+				break ;
 			dp = dp->next;
 		}
-		dp_exist ? free_dp(dp) : 0;
+		ls.dp_exist ? free_dp(dp) : 0;
 	}
 }
 
@@ -69,7 +67,5 @@ int		main(int ac, char *av[])
 		}
 	}
 	(ac == 1) ? ft_ls(ls, ".", 0) : 0;
-	// while (1)
-	// 	sleep(1);
 	return (0);
 }
